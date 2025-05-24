@@ -6,7 +6,7 @@ services:
       context: . # Contexto é a pasta raiz 'pressell/'
       dockerfile: Dockerfile.frontend # O Dockerfile que criamos para o frontend
     ports:
-      - "3000:3000" # Mapeia a porta 3000 do container para a porta 3000 da sua VPS
+      - "3001:3000" # Mapeia a porta 3000 do container para a porta 3001 da sua VPS
     restart: always
     networks:
       - pressell-net
