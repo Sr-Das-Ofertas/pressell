@@ -1,0 +1,27 @@
+{
+  "name": "pressell-page",
+  "version": "1.0.0",
+  "description": "Static pressel page",
+  "main": "index.html",
+  "scripts": {
+    "start:frontend": "serve -s . -p 3000",
+    "start:backend": "cd backend && node server.js",
+    "start": "concurrently \"bun run start:frontend\" \"bun run start:backend\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "serve": "^14.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "concurrently": "^9.1.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

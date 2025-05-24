@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Jogador</title>
+    <link rel="icon" href="cursoonline.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #EFEFEF; /* Fundo cinza claro, como no exemplo */
+            color: #333333; /* Cor de texto escura padrão */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #FFFFFF; /* Container branco */
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+        h1 {
+            color: rgb(216, 26, 13); /* Vermelho principal para o título */
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        h2 { /* Para "Confirme seus dados:" */
+            color: #333333; /* Cor escura para subtitulos */
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555555; /* Cinza escuro para labels */
+            text-align: left;
+            font-size: 1em;
+        }
+        input[type="text"] {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #cccccc; /* Borda cinza clara */
+            background-color: #f8f9fa; /* Fundo do input levemente acinzentado */
+            color: #333333;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: rgb(216, 26, 13); /* Destaque vermelho no foco */
+            box-shadow: 0 0 8px rgba(216, 26, 13, 0.3);
+            outline: none;
+        }
+        button {
+            background-color: rgb(216, 26, 13); /* Vermelho principal */
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: rgb(180, 20, 10); /* Vermelho um pouco mais escuro no hover */
+            transform: translateY(-1px);
+        }
+        button.secondary {
+            background-color: #e0e0e0; /* Cinza claro para botão secundário */
+            color: #333333;
+            border: 1px solid #cccccc;
+        }
+        button.secondary:hover {
+            background-color: #d0d0d0;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            color: #888888;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #userInfoSection p {
+            font-size: 1em;
+            color: #333333;
+            margin: 12px 0;
+            text-align: left;
+            padding: 10px 12px;
+            background-color: #f8f9fa; /* Fundo claro para os itens de informação */
+            border-radius: 5px;
+            border-left: 4px solid rgb(216, 26, 13); /* Destaque lateral vermelho */
+        }
+        #userInfoSection p strong {
+            color: rgb(216, 26, 13); /* Label em vermelho */
+            min-width: 120px; 
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: 700;
+        }
+        #messageSection {
+            margin-top: 25px;
+            font-size: 1em;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .error-message {
+            background-color: rgba(216, 26, 13, 0.1);
+            color: rgb(216, 26, 13);
+            border: 1px solid rgba(216, 26, 13, 0.5);
+        }
+        .success-message {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745; /* Verde para sucesso */
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        .info-message {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: #17a2b8; /* Azul/ciano para info */
+            border: 1px solid rgba(23, 162, 184, 0.5);
+        }
+        .loader {
+            border: 4px solid #e0e0e0; /* Cor base do loader (cinza claro) */
+            border-top: 4px solid rgb(216, 26, 13); /* Cor de destaque vermelha */
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 25px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="previewOfferSection" style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 6px; border: 1px solid #eee;">
+            <h2 style="font-size: 1.2em; margin-bottom: 10px;">Ofertas Especiais Para Você!</h2>
+            <p style="font-size: 0.9em; margin-bottom:10px;">Conecte seu ID para ofertas personalizadas ou veja as opções gerais.</p>
+            
+            <div style="padding:10px; margin-top:10px; border:1px solid #ddd; border-radius:6px; background-color: #fff;">
+                <h3 style="font-size: 1em; margin-top:0; margin-bottom: 5px; color: #333;">Treinamento VIP Free Fire 🔥</h3>
+                <p style="font-size:0.85em; line-height:1.4; margin-bottom: 5px;">Dicas de elite para subir de patente!</p>
+                <button id="saibaMaisCursoButton" style="background: none; border: none; color: #555; padding: 0; font-size: 0.85em; cursor: pointer; text-decoration: underline;">Saiba Mais</button>
+            </div>
+        </div>
+
+        <!-- Modal para Detalhes do Curso -->
+        <div id="cursoModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div style="background-color: #fff; margin: auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 90%; max-width: 500px; text-align: left; position: relative;">
+                <span id="closeCursoModal" class="close-modal-button" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</span>
+                <h2 style="color: #d61a0d; margin-top:0; margin-bottom:15px; font-size: 1.5em;">Acesso VIP ao Treinamento Estratégico com Jogadores Mestre+ 🔥</h2>
+                <p style="font-size:0.95em; line-height:1.5; margin-bottom:10px;">🎯 Aprenda os segredos dos jogadores de elite e suba de patente mais rápido!<br>
+                Receba dicas exclusivas, táticas de movimentação, posicionamento competitivo e treinamento 1-a-1 com jogadores veteranos do Free Fire.<br>
+                Ideal para quem quer alcançar Mestre e Dominador com eficiência e sem hacks.</p>
+
+                <div style="margin: 15px 0;">
+                    <h4 style="margin-bottom:5px; color:#333;">O que mais você vai aprender:</h4>
+                    <ul style="font-size:0.9em; line-height:1.5; margin-left: 20px; margin-bottom:15px;">
+                        <li>Análise de replays para identificar erros e acertos.</li>
+                        <li>Configurações otimizadas de sensibilidade e HUD.</li>
+                        <li>Comunicação eficaz em squad e estratégias de equipe.</li>
+                        <li>Mentalidade vencedora e controle emocional em partidas ranqueadas.</li>
+                    </ul>
+                </div>
+
+                <div class="video-container" style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; max-width: 100%; background: #000; margin-bottom:15px;">
+                    <iframe 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"
+                        src="https://www.youtube.com/embed/PovLq41p3Qg?modestbranding=1&rel=0"
+                        title="Vídeo do Curso"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+                <p style="font-size: 1.2em; font-weight: bold; color: #333; margin-top:20px; margin-bottom: 20px; text-align:center;">Consultoria Exclusiva: <span style="color: #d61a0d; font-size:1.3em;">R$ 547,00</span></p>
+                <a href="https://wa.me/5522981481287" target="_blank" style="display: block; background-color: rgb(216, 26, 13); color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; text-align: center; margin-bottom: 10px;">Entrar em contato para mais informações</a>
+                <button id="fecharModalDetalhesButton" class="secondary close-modal-button" style="display:block; margin: 0 auto; width:auto; padding: 10px 20px;">Fechar</button>
+            </div>
+        </div>
+
+        <div id="inputSection" style="padding: 25px; margin-top: 20px; border: 1px solid #d61a0d; border-radius: 8px; background-color: #fffafa; box-shadow: 0 2px 8px rgba(216, 26, 13, 0.1);">
+            <label for="playerUid"><img src="diamond.png" alt="Diamante" style="width: 20px; height: auto; margin-right: 8px; vertical-align: middle;">Descubra ofertas personalizadas baseadas no seu perfil do jogo!</label>
+            <input type="text" id="playerUid" name="playerUid" placeholder="Digite seu ID do Free Fire">
+            <p style="font-size: 0.9em; color: #555; margin-top: -15px; margin-bottom: 20px;">Não tem conta ou quer ver ofertas sem desconto? <a href="#" id="skipLoginButton" style="color: #555; text-decoration: underline;">Continue mesmo assim</a>.</p>
+            
+            <label for="region">Região:</label>
+            <input type="text" id="region" name="region" placeholder="Ex: br, us, pk (padrão: br)">
+            
+            <button id="checkIdButton">Verificar ID</button>
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <div id="userInfoSection" style="display:none;">
+            <h2>Confirme seus dados:</h2>
+            <p><strong>Nome:</strong> <span id="playerName"></span></p>
+            <p><strong>Nível:</strong> <span id="playerLevel"></span></p>
+            <p><strong>Região:</strong> <span id="playerApiRegion"></span></p>
+            <p><strong>ID da Conta:</strong> <span id="playerAccountId"></span></p>
+            <p><strong>Último Login:</strong> <span id="playerLastLogin"></span></p>
+            <button id="confirmButton">Sim, sou eu!</button>
+            <button id="notMeButton" class="secondary">Não sou eu / Tentar outro ID</button>
+        </div>
+        
+        <div id="messageSection"></div>
+    
+        <div id="generalOffersNavigation" style="display:none; margin-top:20px;">
+            <button id="backToIdButton" style="width: auto; padding: 10px 15px;">Voltar para Inserir ID</button>
+        </div>
+
+        <div id="termsSection" style="margin-top: 30px; font-size: 0.8em; color: #666;">
+            <p>Este site não é afiliado à Garena ou Free Fire. Todas as marcas registradas são propriedade de seus respectivos donos.</p>
+            <p><a href="#" id="openTermosButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Termos de Uso</a> | <a href="#" id="openPrivacidadeButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Política de Privacidade</a></p>
+        </div>
+    </div>
+
+    <!-- Modal para Termos de Uso -->
+    <div id="termosModal" style="display: none; position: fixed; z-index: 1010; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); align-items: center; justify-content: center;">
+        <div style="background-color: #fff; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); width: 90%; max-width: 700px; text-align: left; position: relative; max-height: 80vh; overflow-y: auto;">
+            <span class="close-modal-button" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</span>
+            <h2 style="margin-top:0; color: #333;">Termos de Uso</h2>
+            <div id="termosContent" style="font-size: 0.9em; line-height: 1.6;">
+                <p><strong>Última Atualização:</strong> 18 de Abril de 2025</p>
+                <p>Bem-vindo aos nossos serviços! Ao utilizar este site, você concorda com os seguintes termos e condições:</p>
+                <p><strong>1. Identificação da Empresa:</strong><br>
+                CO CURSOS ONLINE S.A. (Nome Fantasia: PERCURSA)<br>
+                CNPJ: 31.423.623/0001-09<br>
+                Endereço: RUA HENRI DUNANT, 873, CONJ 406 ANDAR 4, SANTO AMARO, SAO PAULO - SP, CEP: 04709-111<br>
+                Email: CONTATO@CURSERIA.COM<br>
+                Telefone: (11) 5181-2469</p>
+                <p><strong>2. Objeto:</strong><br>
+                Estes termos regem o uso do site e dos serviços oferecidos, incluindo a visualização de ofertas e a eventual interação para obtenção de produtos ou serviços relacionados a jogos, como o Free Fire.</p>
+                <p><strong>3. Uso do Site:</strong><br>
+                Você concorda em usar o site apenas para fins legais e de acordo com estes Termos. Você não deve usar o site de qualquer forma que possa danificar, desabilitar, sobrecarregar ou prejudicar o site, ou interferir no uso de qualquer outra parte.</p>
+                <p><strong>4. Conta do Usuário e ID do Jogador:</strong><br>
+                Para acessar ofertas personalizadas, pode ser solicitado o seu ID de jogador do Free Fire. Você é responsável por fornecer informações precisas. A segurança de sua conta no jogo é de sua responsabilidade.</p>
+                <p><strong>5. Propriedade Intelectual:</strong><br>
+                O conteúdo exibido no site, incluindo textos, gráficos, logos, ícones, imagens, clipes de áudio, downloads digitais, compilações de dados e software, é propriedade da CO CURSOS ONLINE S.A. ou de seus fornecedores de conteúdo e protegido pelas leis de direitos autorais.</p>
+                <p><strong>6. Isenção de Garantias e Limitação de Responsabilidade:</strong><br>
+                Este site é fornecido "como está" e "conforme disponível". Não garantimos que o site será ininterrupto ou livre de erros. Em nenhuma circunstância a CO CURSOS ONLINE S.A. será responsável por quaisquer danos diretos, indiretos, incidentais, especiais ou consequenciais resultantes do uso ou da incapacidade de usar o site.</p>
+                <p><strong>7. Não Afiliação:</strong><br>
+                Este site e seus serviços não são afiliados, endossados ou patrocinados pela Garena ou pelos desenvolvedores do Free Fire, a menos que explicitamente declarado. Todas as marcas registradas são propriedade de seus respectivos donos.</p>
+                <p><strong>8. Modificações nos Termos:</strong><br>
+                Reservamo-nos o direito de modificar estes Termos a qualquer momento. A data da "Última Atualização" no topo destes Termos indicará quando as alterações foram feitas. Seu uso continuado do site após tais modificações constitui sua concordância com os novos Termos.</p>
+                <p><strong>9. Lei Aplicável e Foro:</strong><br>
+                Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil, e você se submete irrevogavelmente à jurisdição exclusiva dos tribunais localizados em São Paulo - SP para resolver qualquer disputa que surja.</p>
+                <p><strong>10. Contato:</strong><br>
+                Para quaisquer dúvidas sobre estes Termos de Uso, entre em contato conosco pelo e-mail: CONTATO@CURSERIA.COM.</p>
+            </div>
+            <button class="close-modal-button" style="display:block; margin: 20px auto 0; padding: 10px 20px; background-color: #ccc; border: none; border-radius: 5px; cursor: pointer;">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal para Política de Privacidade -->
+    <div id="privacidadeModal" style="display: none; position: fixed; z-index: 1010; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); align-items: center; justify-content: center;">
+        <div style="background-color: #fff; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); width: 90%; max-width: 700px; text-align: left; position: relative; max-height: 80vh; overflow-y: auto;">
+            <span class="close-modal-button" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</span>
+            <h2 style="margin-top:0; color: #333;">Política de Privacidade</h2>
+            <div id="privacidadeContent" style="font-size: 0.9em; line-height: 1.6;">
+                <p><strong>Última Atualização:</strong> 18 de Abril de 2025</p>
+                <p>A CO CURSOS ONLINE S.A. ("nós", "nosso" ou "PERCURSA") está comprometida em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você visita nosso site.</p>
+                <p><strong>1. Controlador dos Dados:</strong><br>
+                CO CURSOS ONLINE S.A.<br>
+                CNPJ: 31.423.623/0001-09<br>
+                Endereço: RUA HENRI DUNANT, 873, CONJ 406 ANDAR 4, SANTO AMARO, SAO PAULO - SP, CEP: 04709-111<br>
+                Email para questões de privacidade: CONTATO@CURSERIA.COM</p>
+                <p><strong>2. Informações que Coletamos:</strong><br>
+                Podemos coletar informações sobre você de várias maneiras, incluindo:<br>
+                a. <strong>Dados Pessoais Identificáveis:</strong> Se você optar por nos fornecer seu ID de jogador do Free Fire, nome (conforme associado ao ID) ou outras informações de contato para receber ofertas personalizadas ou suporte.<br>
+                b. <strong>Dados de Uso:</strong> Informações que seu navegador envia automaticamente sempre que você visita o Site, como seu endereço IP, tipo de navegador, versão do navegador, as páginas do nosso Site que você visita, a hora e data da sua visita, o tempo gasto nessas páginas e outras estatísticas.<br>
+                c. <strong>Cookies e Tecnologias de Rastreamento:</strong> Usamos cookies e tecnologias de rastreamento semelhantes para rastrear a atividade em nosso Site e manter certas informações. Você pode instruir seu navegador a recusar todos os cookies ou a indicar quando um cookie está sendo enviado.</p>
+                <p><strong>3. Uso de Suas Informações:</strong><br>
+                Usamos as informações coletadas para:<br>
+                - Fornecer, operar e manter nosso Site;<br>
+                - Personalizar e melhorar sua experiência no Site;<br>
+                - Apresentar ofertas personalizadas com base em seu perfil de jogo (se o ID for fornecido);<br>
+                - Entender e analisar como você usa nosso Site;<br>
+                - Comunicar com você, diretamente ou através de um de nossos parceiros, inclusive para atendimento ao cliente, para fornecer atualizações e outras informações relativas ao Site e para fins de marketing e promocionais (com seu consentimento, quando exigido por lei).<br>
+                - Processar suas transações e gerenciar seus pedidos (se aplicável).</p>
+                <p><strong>4. Compartilhamento de Suas Informações:</strong><br>
+                Não vendemos, trocamos ou alugamos suas informações de identificação pessoal a terceiros. Podemos compartilhar informações agregadas e não identificáveis sobre nossos usuários com parceiros de negócios, afiliados confiáveis e anunciantes para os fins descritos acima. Se utilizarmos provedores de serviços terceirizados, eles terão acesso às suas informações apenas para realizar tarefas em nosso nome e são obrigados a não divulgá-las ou usá-las para qualquer outra finalidade.</p>
+                <p><strong>5. Segurança de Suas Informações:</strong><br>
+                Empregamos medidas de segurança administrativa, técnica e física para ajudar a proteger suas informações pessoais. Embora tenhamos tomado medidas razoáveis para proteger as informações pessoais que você nos fornece, esteja ciente de que nenhum sistema de segurança é perfeito ou impenetrável.</p>
+                <p><strong>6. Seus Direitos de Proteção de Dados (LGPD):</strong><br>
+                Você tem o direito de:<br>
+                - Confirmar a existência de tratamento de seus dados;<br>
+                - Acessar seus dados;<br>
+                - Corrigir dados incompletos, inexatos ou desatualizados;<br>
+                - Solicitar a anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a LGPD;<br>
+                - Solicitar a portabilidade dos seus dados a outro fornecedor de serviço ou produto;<br>
+                - Solicitar a eliminação dos dados pessoais tratados com o seu consentimento;<br>
+                - Obter informações sobre as entidades públicas e privadas com as quais o controlador realizou uso compartilhado de dados;<br>
+                - Ser informado sobre a possibilidade de não fornecer consentimento e sobre as consequências da negativa;<br>
+                - Revogar o consentimento.<br>
+                Para exercer esses direitos, entre em contato conosco através do e-mail: CONTATO@CURSERIA.COM.</p>
+                <p><strong>7. Links para Outros Sites:</strong><br>
+                Nosso Site pode conter links para outros sites que não são operados por nós. Se você clicar em um link de terceiros, será direcionado para o site desse terceiro. Aconselhamos vivamente que reveja a Política de Privacidade de cada site que visita.</p>
+                <p><strong>8. Alterações a Esta Política de Privacidade:</strong><br>
+                Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data da "Última Atualização".</p>
+                <p><strong>9. Contato:</strong><br>
+                Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco: CONTATO@CURSERIA.COM.</p>
+            </div>
+            <button class="close-modal-button" style="display:block; margin: 20px auto 0; padding: 10px 20px; background-color: #ccc; border: none; border-radius: 5px; cursor: pointer;">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        // const USER_UID_API = "jOLNDleVHoaRt7CWliSsvnVZ7bJ2"; // REMOVIDO - Agora no backend
+        // const API_KEY_API = "4FhoLUHvMr2PuDdveKSruMJ9IzzRtP"; // REMOVIDO - Agora no backend
+        // const BASE_URL_API = "https://hl-gaming-official-main-api-beige.vercel.app/api"; // REMOVIDO
+        const BACKEND_URL = "http://localhost:3002/api/checkplayer"; // URL do seu backend ATUALIZADA para porta 3002
+        const MAX_ATTEMPTS = 7;
+
+        const playerUidInput = document.getElementById('playerUid');
+        const regionInput = document.getElementById('region');
+        const checkIdButton = document.getElementById('checkIdButton');
+        const skipLoginButton = document.getElementById('skipLoginButton'); // Novo botão
+        const backToIdButton = document.getElementById('backToIdButton'); // Botão Voltar
+        const loader = document.getElementById('loader');
+        
+        const inputSection = document.getElementById('inputSection');
+        const userInfoSection = document.getElementById('userInfoSection');
+        const messageSection = document.getElementById('messageSection');
+        const generalOffersNavigation = document.getElementById('generalOffersNavigation'); // Div do botão Voltar
+        
+        const playerNameEl = document.getElementById('playerName');
+        const playerLevelEl = document.getElementById('playerLevel');
+        const playerApiRegionEl = document.getElementById('playerApiRegion');
+        const playerAccountIdEl = document.getElementById('playerAccountId');
+        const playerLastLoginEl = document.getElementById('playerLastLogin');
+        
+        const confirmButton = document.getElementById('confirmButton');
+        const notMeButton = document.getElementById('notMeButton');
+
+        // Elementos do Modal do Curso
+        const cursoModal = document.getElementById('cursoModal');
+        const saibaMaisCursoButton = document.getElementById('saibaMaisCursoButton');
+        const closeCursoModal = document.getElementById('closeCursoModal'); // Span 'X' para fechar
+        const fecharModalDetalhesButton = document.getElementById('fecharModalDetalhesButton'); // Botão 'Fechar' no modal
+        
+        // Elementos dos Modais de Termos e Privacidade
+        const termosModal = document.getElementById('termosModal');
+        const privacidadeModal = document.getElementById('privacidadeModal');
+        const openTermosButton = document.getElementById('openTermosButton');
+        const openPrivacidadeButton = document.getElementById('openPrivacidadeButton');
+        
+        // Seleciona TODOS os botões de fechar genéricos (X e botão "Fechar")
+        const allCloseModalButtons = document.querySelectorAll('.close-modal-button');
+
+        function getLoginAttempts() {
+            return parseInt(localStorage.getItem('loginAttempts') || '0');
+        }
+
+        function setLoginAttempts(attempts) {
+            localStorage.setItem('loginAttempts', attempts.toString());
+        }
+
+        function isBlocked() {
+            return localStorage.getItem('isBlocked') === 'true';
+        }
+
+        function setBlocked(blocked) {
+            localStorage.setItem('isBlocked', blocked.toString());
+        }
+
+        function displayMessage(text, type = 'info') {
+            messageSection.innerHTML = `<p class="${type}-message">${text}</p>`;
+        }
+
+        function resetUI() {
+            userInfoSection.style.display = 'none';
+            inputSection.style.display = 'block';
+            playerUidInput.value = '';
+            // regionInput.value = ''; // Pode manter a região ou limpar
+            messageSection.innerHTML = '';
+            checkIdButton.disabled = false;
+            playerUidInput.disabled = false;
+            regionInput.disabled = false;
+            if (skipLoginButton) skipLoginButton.style.display = 'inline'; // Mostra o botão de pular
+        }
+
+        function handleBlockedState() {
+            if (isBlocked()) {
+                displayMessage(`Você excedeu o número máximo de ${MAX_ATTEMPTS} tentativas. Por favor, tente novamente mais tarde.`, 'error');
+                checkIdButton.disabled = true;
+                playerUidInput.disabled = true;
+                regionInput.disabled = true;
+                inputSection.style.display = 'block'; // Garantir que o formulário (desabilitado) seja visível
+                userInfoSection.style.display = 'none';
+                if (skipLoginButton) skipLoginButton.style.display = 'none'; // Esconde o botão de pular se bloqueado
+                return true;
+            }
+            return false;
+        }
+        
+        async function checkPlayerId() {
+            if (handleBlockedState()) return;
+
+            const playerUid = playerUidInput.value.trim();
+            const region = regionInput.value.trim() || 'br'; // Padrão 'br' se vazio
+
+            if (!playerUid) {
+                displayMessage('Por favor, insira seu ID de Jogador para ofertas personalizadas, ou clique em "Continue mesmo assim" para ofertas gerais.', 'error');
+                return;
+            }
+
+            loader.style.display = 'block';
+            checkIdButton.disabled = true;
+            if (skipLoginButton) skipLoginButton.style.display = 'none'; // Esconde o botão de pular durante a verificação
+            messageSection.innerHTML = '';
+            userInfoSection.style.display = 'none';
+
+            // Monta os parâmetros para o SEU backend
+            const paramsToBackend = new URLSearchParams({
+                PlayerUid: playerUid,
+                region: region
+            });
+
+            try {
+                // Chama o SEU backend
+                const response = await fetch(`${BACKEND_URL}?${paramsToBackend.toString()}`);
+                const data = await response.json(); // Resposta do SEU backend
+
+                if (!response.ok || data.error || !data.result || !data.result.AccountInfo || !data.result.AccountInfo.AccountName) {
+                    let attempts = getLoginAttempts() + 1;
+                    setLoginAttempts(attempts);
+                    // Se o backend retornar um erro específico, use-o, senão a mensagem genérica
+                    const errorMessage = data.error ? data.error : 'ID de Jogador não encontrado ou inválido. Verifique o ID e a região e tente novamente.';
+                    displayMessage(errorMessage, 'error');
+                    if (attempts >= MAX_ATTEMPTS) {
+                        setBlocked(true);
+                        handleBlockedState();
+                    } else {
+                        if (skipLoginButton) skipLoginButton.style.display = 'inline'; // Mostra o botão de pular se não bloqueado
+                    }
+                } else {
+                    setLoginAttempts(0); // Reseta tentativas em sucesso
+                    
+                    const accInfo = data.result.AccountInfo;
+                    const socialInfo = data.result.socialinfo;
+                    const captainInfo = data.result.captainBasicInfo;
+
+                    playerNameEl.textContent = accInfo.AccountName || 'N/A';
+                    playerLevelEl.textContent = accInfo.AccountLevel || 'N/A';
+                    playerApiRegionEl.textContent = accInfo.AccountRegion || 'N/A';
+                    
+                    // Tenta obter ID de várias fontes
+                    let accountId = socialInfo?.AccountID || captainInfo?.accountId || playerUid;
+                    playerAccountIdEl.textContent = accountId;
+                    
+                    playerLastLoginEl.textContent = accInfo.AccountLastLogin ? 
+                        new Date(parseInt(accInfo.AccountLastLogin) * 1000).toLocaleString('pt-BR') : 'N/A';
+
+                    inputSection.style.display = 'none';
+                    userInfoSection.style.display = 'block';
+                    displayMessage('Verifique se os dados abaixo estão corretos.', 'info');
+                    if (skipLoginButton) skipLoginButton.style.display = 'none'; // Esconde o botão de pular após login bem-sucedido
+                    if (generalOffersNavigation) generalOffersNavigation.style.display = 'block'; // Mostra o botão Voltar
+                }
+            } catch (error) {
+                console.error("Erro ao buscar dados:", error);
+                displayMessage('Ocorreu um erro ao conectar com o servidor. Tente novamente.', 'error');
+                if (skipLoginButton) skipLoginButton.style.display = 'inline'; // Mostra o botão de pular em caso de erro de conexão
+                // Não conta como tentativa de login errada, pois pode ser erro de rede
+            } finally {
+                loader.style.display = 'none';
+                if (!isBlocked()){ // Só reabilita o botão se não estiver bloqueado
+                   checkIdButton.disabled = false;
+                   // O skipLoginButton já foi tratado nos blocos try/catch/else
+                }
+            }
+        }
+
+        confirmButton.addEventListener('click', () => {
+            displayMessage('Identidade confirmada!', 'success');
+            
+            // Constrói a URL completa para o endpoint de redirecionamento do backend
+            const redirectEndpointUrl = `${BACKEND_URL.replace("/checkplayer", "/perform-redirect")}`;
+
+            // O navegador fará uma requisição GET para este endpoint,
+            // e o backend responderá com um redirecionamento HTTP 302.
+            setTimeout(() => {
+                window.location.href = redirectEndpointUrl;
+            }, 1500); // Pequeno delay para o usuário ler a mensagem
+        });
+
+        notMeButton.addEventListener('click', () => {
+            resetUI();
+            if (handleBlockedState()) return; // Se já estiver bloqueado, não faz mais nada além de mostrar msg
+            // Não incrementa tentativas aqui, pois o usuário está escolhendo tentar de novo
+            // O skipLoginButton é restaurado por resetUI()
+        });
+
+        checkIdButton.addEventListener('click', checkPlayerId);
+
+        if (skipLoginButton) {
+            skipLoginButton.addEventListener('click', (e) => {
+                e.preventDefault(); // Previne comportamento padrão do link
+                // AQUI: Defina para onde o usuário será redirecionado ou qual conteúdo será mostrado
+                // Por enquanto, vamos apenas exibir uma mensagem e esconder a seção de ID
+                displayMessage('volte e coloque seu id de jogador para ver todos os planos', 'info');
+                inputSection.style.display = 'none';
+                userInfoSection.style.display = 'none'; 
+                loader.style.display = 'none';
+                if (generalOffersNavigation) generalOffersNavigation.style.display = 'block'; // Mostra o botão Voltar
+
+                // Você pode querer redirecionar para uma URL específica aqui, por exemplo:
+                // window.location.href = "URL_DA_OFERTA_GERAL";
+                // Ou carregar dinamicamente conteúdo de ofertas gerais na página.
+                // Para fins de exemplo, a mensagem acima é suficiente.
+            });
+        }
+        
+        if (backToIdButton && generalOffersNavigation) {
+            backToIdButton.addEventListener('click', () => {
+                inputSection.style.display = 'block'; // Mostra a seção de input do ID novamente
+                messageSection.innerHTML = ''; // Limpa a mensagem de "ofertas gerais"
+                generalOffersNavigation.style.display = 'none'; // Esconde o botão Voltar
+                // O skipLoginButton já está na inputSection, então volta a ser visível.
+                // A previewOfferSection não foi escondida, então permanece visível.
+            });
+        }
+        
+        // Verifica o estado de bloqueio ao carregar a página
+        window.addEventListener('load', () => {
+            if (regionInput.value === '') { // Define valor padrão para região se estiver vazio no load
+                regionInput.value = 'br';
+            }
+            handleBlockedState();
+        });
+
+        // Funcionalidade do Modal de Detalhes do Curso
+        if (saibaMaisCursoButton && cursoModal) {
+            saibaMaisCursoButton.addEventListener('click', () => {
+                cursoModal.style.display = 'flex';
+            });
+        }
+
+        // Funcionalidade para abrir modais de Termos e Privacidade
+        if (openTermosButton && termosModal) {
+            openTermosButton.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevenir comportamento padrão do link
+                termosModal.style.display = 'flex';
+            });
+        }
+
+        if (openPrivacidadeButton && privacidadeModal) {
+            openPrivacidadeButton.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevenir comportamento padrão do link
+                privacidadeModal.style.display = 'flex';
+            });
+        }
+
+        // Funcionalidade genérica para fechar QUALQUER modal que tenha um botão com a classe 'close-modal-button'
+        allCloseModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Encontra o modal pai do botão que foi clicado e o esconde
+                let modalToClose = button.closest('#cursoModal, #termosModal, #privacidadeModal');
+                if (modalToClose) {
+                    modalToClose.style.display = 'none';
+                }
+            });
+        });
+
+        // Opcional: Fechar o modal clicando fora dele (para todos os modais)
+        window.addEventListener('click', (event) => {
+            if (event.target == cursoModal) {
+                cursoModal.style.display = 'none';
+            }
+            if (event.target == termosModal) {
+                termosModal.style.display = 'none';
+            }
+            if (event.target == privacidadeModal) {
+                privacidadeModal.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html> 

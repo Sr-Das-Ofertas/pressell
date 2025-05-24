@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: . # Contexto é a pasta raiz 'pressell/'
+      dockerfile: Dockerfile.frontend # O Dockerfile que criamos para o frontend
+    ports:
+      - "3000:3000" # Mapeia a porta 3000 do container para a porta 3000 da sua VPS
+    restart: always
+    networks:
+      - pressell-net
+
+  backend:
+    build:
+      context: ./backend # Contexto é a pasta 'pressell/backend/'
+      dockerfile: Dockerfile  # O Dockerfile dentro da pasta backend
+    ports:
+      - "3002:3002" # Mapeia a porta 3002 do container para a porta 3002 da sua VPS
+    restart: always
+    # Se o seu backend/server.js usa variáveis de ambiente de um arquivo .env,
+    # você pode defini-las aqui ou usar um arquivo .env com docker-compose.
+    # Certifique-se de criar este arquivo .env na VPS e NÃO o adicione ao Git se contiver segredos.
+    # Exemplo com env_file (crie um backend.env na pasta backend/ ou raiz):
+    # env_file:
+    #   - ./backend/.env # Caminho relativo ao docker-compose.yml
+    # Ou defina variáveis individualmente se forem poucas e não secretas:
+    # environment:
+    #   - NODE_ENV=production
+    #   - VARIAVEL_EXEMPLO=valor_exemplo
+    networks:
+      - pressell-net
+
+networks:
+  pressell-net:
+    driver: bridge 
