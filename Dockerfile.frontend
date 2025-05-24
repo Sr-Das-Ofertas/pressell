@@ -31,4 +31,4 @@ EXPOSE 3000
 # O -s direciona todas as requisições para index.html
 # O . indica para servir o diretório atual
 # O -l tcp://0.0.0.0:3000 garante que o serve escute em todas as interfaces dentro do container
-CMD [ "serve", "-s", ".", "-l", "tcp://0.0.0.0:3000" ] 
+CMD [ "bunx", "serve", "-s", ".", "-l", "tcp://0.0.0.0:3000" ] 
