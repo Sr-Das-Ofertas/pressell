@@ -2,11 +2,12 @@
 
 ## Foco Atual
 
-* Verificar se a correção no `Dockerfile.frontend` resolve o erro de deploy.
+* Verificar se a instalação global do `bun` no `Dockerfile.frontend` resolve o erro `bun: not found`.
 
 ## Mudanças Recentes
 
-*   Alterado `COPY package.json bun.lockb ./` para `COPY package.json bun.lock ./` no `Dockerfile.frontend` para corresponder ao nome de arquivo real (`bun.lock`).
+* Adicionado `RUN npm install -g bun` ao `Dockerfile.frontend` antes do passo `RUN bun install --production --no-save`.
+* Correção anterior: Alterado `COPY package.json bun.lockb ./` para `COPY package.json bun.lock ./`.
 
 ## Próximos Passos
 
@@ -26,4 +27,5 @@
 ## Aprendizados e Insights do Projeto
 
 * O contexto de build do Docker é crucial. Arquivos não presentes no contexto não podem ser copiados para a imagem.
-* É importante verificar os nomes exatos dos arquivos, incluindo extensões e formatos (ex: `bun.lock` vs `bun.lockb`). 
+* É importante verificar os nomes exatos dos arquivos, incluindo extensões e formatos (ex: `bun.lock` vs `bun.lockb`).
+* A imagem base do Docker (`node:18-alpine`) pode não incluir todas as ferramentas necessárias (como `bun`), que precisam ser instaladas explicitamente. 

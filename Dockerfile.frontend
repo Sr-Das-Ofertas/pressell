@@ -8,6 +8,9 @@ WORKDIR /usr/src/app/frontend
 # para instalar 'serve'
 COPY package.json bun.lock ./
 
+# Instale o bun globalmente
+RUN npm install -g bun
+
 # Instale as dependências (principalmente 'serve')
 RUN bun install --production --no-save
 
