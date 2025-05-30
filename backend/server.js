@@ -11,64 +11,167 @@ const app = express();
 const PORT = process.env.PORT || 3002; // Porta alterada para 3002
 const FF_NEW_BASE_URL_FROM_ENV = process.env.FF_NEW_BASE_URL; // Nova variável
 
-// Credenciais da API HL Gaming lidas do .env
-const USER_UID_API = process.env.CLIENT_ID;
-const API_KEY_API = process.env.API_KEY;
-const HL_GAMING_BASE_URL = "https://hl-gaming-official-main-api-beige.vercel.app/api";
+// Credenciais e URL da API ff.deaddos.online
+const API_KEY_API = process.env.API_KEY; // Já lê do .env
+const FF_API_BASE_URL = "https://free-fire-data-main.vercel.app/api/data"; // Nova URL da API
+
+// Webhook do Discord para notificações
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1378036772239315100/59C3Sc3KL-WQOmNDBGvM6blr0VGUv8Gh_dH34n1IiHaRYH_E7duGlBx9nAPQC9SbrLqq";
 
 let lastPlayerData = null; // Variável para armazenar temporariamente os dados do jogador
+
+// Função para enviar notificação ao Discord
+async function sendDiscordNotification(playerUid, error, details) {
+    try {
+        const embed = {
+            embeds: [{
+                title: "⚠️ Falha na API Free Fire",
+                description: `Falha ao buscar dados após 3 tentativas`,
+                color: 15158332, // Vermelho
+                fields: [
+                    {
+                        name: "🆔 Player UID",
+                        value: `\`${playerUid}\``,
+                        inline: true
+                    },
+                    {
+                        name: "🌍 Região",
+                        value: "BR",
+                        inline: true
+                    },
+                    {
+                        name: "⏰ Timestamp",
+                        value: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                        inline: true
+                    },
+                    {
+                        name: "❌ Erro",
+                        value: `\`\`\`${error}\`\`\``,
+                        inline: false
+                    }
+                ],
+                footer: {
+                    text: "Pressell Backend Monitor"
+                },
+                timestamp: new Date()
+            }]
+        };
+
+        // Se houver detalhes adicionais, adiciona como campo
+        if (details && Object.keys(details).length > 0) {
+            embed.embeds[0].fields.push({
+                name: "📋 Detalhes",
+                value: `\`\`\`json\n${JSON.stringify(details, null, 2).substring(0, 1000)}\`\`\``,
+                inline: false
+            });
+        }
+
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(embed)
+        });
+
+        if (!response.ok) {
+            console.error('Erro ao enviar notificação ao Discord:', response.status, response.statusText);
+        } else {
+            console.log('Notificação enviada ao Discord com sucesso');
+        }
+    } catch (error) {
+        console.error('Erro ao enviar notificação ao Discord:', error);
+    }
+}
 
 app.use(cors()); // Habilita CORS para que o frontend possa chamar este backend
 app.use(express.json()); // Middleware para parsear JSON no corpo de requisições (não usado neste GET, mas bom ter)
 
 // Endpoint que o frontend chamará
 app.get('/api/checkplayer', async (req, res) => {
-    const { PlayerUid, region } = req.query; // Pega PlayerUid e region da query string
+    const { PlayerUid } = req.query; // Pega PlayerUid da query string, remove region
+    const fixedRegion = 'br'; // Região fixa para a API
 
-    if (!PlayerUid || !region) {
-        return res.status(400).json({ error: "PlayerUid e region são obrigatórios." });
+    if (!PlayerUid) { // Verifica apenas PlayerUid
+        return res.status(400).json({ error: "PlayerUid é obrigatório." });
+    }
+    if (!API_KEY_API) {
+        console.error("Backend: API_KEY não configurada no .env");
+        return res.status(500).json({ error: "Configuração do servidor incompleta." });
     }
 
-    // Monta os parâmetros para a API HL Gaming
-    const paramsToHLGaming = new URLSearchParams({
-        sectionName: "AllData", // Usando AllData como antes
-        PlayerUid: PlayerUid,
-        region: region,
-        useruid: USER_UID_API, // Sua credencial segura
-        api: API_KEY_API       // Sua credencial segura
+    // Monta os parâmetros para a nova API (ff.deaddos.online)
+    const paramsToNewAPI = new URLSearchParams({
+        uid: PlayerUid,
+        key: API_KEY_API
     });
 
-    try {
-        console.log(`Backend: Recebida requisição para PlayerUid: ${PlayerUid}, Region: ${region}`);
-        const apiResponse = await fetch(`${HL_GAMING_BASE_URL}?${paramsToHLGaming.toString()}`);
-        const dataFromHLGaming = await apiResponse.json();
+    let dataFromNewAPI = null;
+    let apiResponse = null;
+    let lastError = null;
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            console.log(`Backend: Tentativa ${attempt} para PlayerUid: ${PlayerUid}. Região fixa: ${fixedRegion}. Usando API: ${FF_API_BASE_URL}`);
+            apiResponse = await fetch(`${FF_API_BASE_URL}/${fixedRegion}?${paramsToNewAPI.toString()}`);
+            dataFromNewAPI = await apiResponse.json();
 
-        if (!apiResponse.ok) {
-            console.error("Backend: Erro da API HL Gaming:", dataFromHLGaming);
-            lastPlayerData = null; // Limpa em caso de erro
-            return res.status(apiResponse.status).json(dataFromHLGaming);
+            if (apiResponse.ok && !dataFromNewAPI.error) {
+                break; // Sucesso, sai do loop
+            } else {
+                lastError = dataFromNewAPI.error || dataFromNewAPI.message || `Erro desconhecido na tentativa ${attempt}`;
+                console.error(`Backend: Erro da API ff.deaddos.online (tentativa ${attempt}):`, dataFromNewAPI);
+            }
+        } catch (error) {
+            lastError = error.message || error;
+            console.error(`Backend: Erro ao fazer proxy para a API ff.deaddos.online (tentativa ${attempt}):`, error);
         }
-        
-        console.log("Backend: Resposta da API HL Gaming enviada para o frontend.");
-        // Armazena os dados relevantes do jogador se a verificação for bem-sucedida
-        if (dataFromHLGaming.result && dataFromHLGaming.result.AccountInfo) {
-            lastPlayerData = {
-                playerUid: PlayerUid, // O UID original usado na busca
-                region: region,     // A região original usada na busca
-                accountName: dataFromHLGaming.result.AccountInfo.AccountName,
-                accountId: dataFromHLGaming.result.socialinfo?.AccountID || dataFromHLGaming.result.captainBasicInfo?.accountId || PlayerUid,
-                // Adicione quaisquer outros dados que você queira passar
-            };
-        } else {
-            lastPlayerData = null;
-        }
-        res.json(dataFromHLGaming); // Envia a resposta da API HL Gaming para o frontend
-
-    } catch (error) {
-        console.error("Backend: Erro ao fazer proxy para a API HL Gaming:", error);
-        lastPlayerData = null; // Limpa em caso de erro
-        res.status(500).json({ error: "Erro interno no servidor ao contatar a API de jogos." });
     }
+
+    if (!apiResponse || !apiResponse.ok || (dataFromNewAPI && dataFromNewAPI.error)) {
+        lastPlayerData = null; // Limpa em caso de erro
+        const errorMessage = lastError || "Erro ao buscar dados do jogador na API externa.";
+        
+        // Envia notificação ao Discord
+        await sendDiscordNotification(PlayerUid, errorMessage, dataFromNewAPI);
+        
+        return res.status(apiResponse && apiResponse.status ? apiResponse.status : 500).json({ error: errorMessage, details: dataFromNewAPI });
+    }
+    
+    console.log("Backend: Resposta da API ff.deaddos.online recebida.");
+
+    // Transforma a resposta da nova API para a estrutura esperada pelo frontend
+    // Frontend espera: data.result.AccountInfo e data.result.socialinfo/captainBasicInfo
+    const transformedData = {
+        result: {
+            AccountInfo: {
+                AccountName: dataFromNewAPI.basicInfo?.nickname || 'N/A',
+                AccountLevel: dataFromNewAPI.basicInfo?.level || 'N/A',
+                AccountRegion: dataFromNewAPI.basicInfo?.region || 'N/A',
+                AccountLastLogin: dataFromNewAPI.basicInfo?.lastLoginAt // O frontend faz o new Date(... * 1000)
+            },
+            socialinfo: { // Usado pelo frontend para playerAccountIdEl
+                AccountID: dataFromNewAPI.basicInfo?.accountId || dataFromNewAPI.socialInfo?.accountId || PlayerUid
+            },
+            captainBasicInfo: { // Também usado como fallback para playerAccountIdEl
+                accountId: dataFromNewAPI.basicInfo?.accountId || dataFromNewAPI.socialInfo?.accountId || PlayerUid
+            }
+            // Adicionar outros campos de creditScoreInfo se necessário pelo frontend no futuro
+        }
+    };
+    
+    // Armazena os dados relevantes do jogador se a verificação for bem-sucedida
+    if (dataFromNewAPI.basicInfo) {
+        lastPlayerData = {
+            playerUid: PlayerUid, // O UID original usado na busca
+            region: fixedRegion,     // A região fixa usada na busca
+            accountName: dataFromNewAPI.basicInfo.nickname,
+            accountId: dataFromNewAPI.basicInfo.accountId || dataFromNewAPI.socialInfo?.accountId || PlayerUid,
+        };
+    } else {
+        lastPlayerData = null;
+    }
+    res.json(transformedData); // Envia a resposta transformada para o frontend
 });
 
 // Novo endpoint para o backend realizar o redirecionamento
@@ -80,7 +183,7 @@ app.get('/api/perform-redirect', (req, res) => {
     if (lastPlayerData && lastPlayerData.playerUid) {
         const queryParams = new URLSearchParams({
             playerUid: lastPlayerData.playerUid,
-            region: lastPlayerData.region,
+            region: lastPlayerData.region, // Continua usando a região armazenada (fixa)
             accountName: lastPlayerData.accountName || '',
             accountId: lastPlayerData.accountId || ''
             // Adicione mais parâmetros conforme necessário

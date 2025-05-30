@@ -12,8 +12,9 @@
             background-color: #EFEFEF; /* Fundo cinza claro, como no exemplo */
             color: #333333; /* Cor de texto escura padrão */
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Para empilhar container e footer */
+            align-items: center; /* Para centralizar container e footer */
+            justify-content: flex-start; /* Alinha ao topo, o espaço virá da margem do container */
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
@@ -26,6 +27,18 @@
             width: 100%;
             max-width: 480px;
             text-align: center;
+            margin-bottom: 50vh; /* Adiciona grande margem inferior para empurrar o footer */
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px; /* Espaço abaixo do logo */
+        }
+        .logo-container img {
+            max-width: 100px; /* Ajuste o tamanho máximo do logo conforme necessário */
+            height: auto;
+            border-radius: 15px; /* Adiciona bordas arredondadas */
         }
         h1 {
             color: rgb(216, 26, 13); /* Vermelho principal para o título */
@@ -120,7 +133,7 @@
         #messageSection {
             margin-top: 25px;
             font-size: 1em;
-            padding: 12px;
+            padding: 2px;
             border-radius: 5px;
             text-align: center;
         }
@@ -153,10 +166,24 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #termsSection {
+            width: 100%;
+            max-width: 480px; /* Para alinhar com o container */
+            margin-top: 30px; /* Mantém a margem superior original */
+            padding-top: 20px; /* Adiciona um padding acima do texto do footer */
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd; /* Linha separadora */
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo-container">
+            <img src="icon.png" alt="Logo do Curso">
+        </div>
+
         <div id="previewOfferSection" style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 6px; border: 1px solid #eee;">
             <h2 style="font-size: 1.2em; margin-bottom: 10px;">Ofertas Especiais Para Você!</h2>
             <p style="font-size: 0.9em; margin-bottom:10px;">Conecte seu ID para ofertas personalizadas ou veja as opções gerais.</p>
@@ -198,18 +225,15 @@
                 </div>
 
                 <p style="font-size: 1.2em; font-weight: bold; color: #333; margin-top:20px; margin-bottom: 20px; text-align:center;">Consultoria Exclusiva: <span style="color: #d61a0d; font-size:1.3em;">R$ 547,00</span></p>
-                <a href="https://wa.me/5522981481287" target="_blank" style="display: block; background-color: rgb(216, 26, 13); color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; text-align: center; margin-bottom: 10px;">Entrar em contato para mais informações</a>
+                <a href="https://wa.me/5522981346374" target="_blank" style="display: block; background-color: rgb(216, 26, 13); color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; text-align: center; margin-bottom: 10px;">Entrar em contato para mais informações</a>
                 <button id="fecharModalDetalhesButton" class="secondary close-modal-button" style="display:block; margin: 0 auto; width:auto; padding: 10px 20px;">Fechar</button>
             </div>
         </div>
 
         <div id="inputSection" style="padding: 25px; margin-top: 20px; border: 1px solid #d61a0d; border-radius: 8px; background-color: #fffafa; box-shadow: 0 2px 8px rgba(216, 26, 13, 0.1);">
-            <label for="playerUid"><img src="diamond.png" alt="Diamante" style="width: 20px; height: auto; margin-right: 8px; vertical-align: middle;">Descubra ofertas personalizadas baseadas no seu perfil do jogo!</label>
+            <label for="playerUid"><img src="diamond.png" alt="Diamante" style="width: 20px; height: auto; margin-right: 8px; vertical-align: middle;">Coloque seu ID para fazer o resgate!</label>
             <input type="text" id="playerUid" name="playerUid" placeholder="Digite seu ID do Free Fire">
             <p style="font-size: 0.9em; color: #555; margin-top: -15px; margin-bottom: 20px;">Não tem conta ou quer ver ofertas sem desconto? <a href="#" id="skipLoginButton" style="color: #555; text-decoration: underline;">Continue mesmo assim</a>.</p>
-            
-            <label for="region">Região:</label>
-            <input type="text" id="region" name="region" placeholder="Ex: br, us, pk (padrão: br)">
             
             <button id="checkIdButton">Verificar ID</button>
         </div>
@@ -233,10 +257,11 @@
             <button id="backToIdButton" style="width: auto; padding: 10px 15px;">Voltar para Inserir ID</button>
         </div>
 
-        <div id="termsSection" style="margin-top: 30px; font-size: 0.8em; color: #666;">
-            <p>Este site não é afiliado à Garena ou Free Fire. Todas as marcas registradas são propriedade de seus respectivos donos.</p>
-            <p><a href="#" id="openTermosButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Termos de Uso</a> | <a href="#" id="openPrivacidadeButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Política de Privacidade</a></p>
-        </div>
+    </div>
+
+    <div id="termsSection">
+        <p>Este site não é afiliado à Garena ou Free Fire. Todas as marcas registradas são propriedade de seus respectivos donos.</p>
+        <p><a href="#" id="openTermosButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Termos de Uso</a> | <a href="#" id="openPrivacidadeButton" style="color: #007bff; text-decoration: underline; cursor:pointer;">Política de Privacidade</a></p>
     </div>
 
     <!-- Modal para Termos de Uso -->
@@ -245,14 +270,14 @@
             <span class="close-modal-button" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</span>
             <h2 style="margin-top:0; color: #333;">Termos de Uso</h2>
             <div id="termosContent" style="font-size: 0.9em; line-height: 1.6;">
-                <p><strong>Última Atualização:</strong> 18 de Abril de 2025</p>
+                <p><strong>Última Atualização:</strong> 30 de Janeiro de 2025</p>
                 <p>Bem-vindo aos nossos serviços! Ao utilizar este site, você concorda com os seguintes termos e condições:</p>
                 <p><strong>1. Identificação da Empresa:</strong><br>
-                CO CURSOS ONLINE S.A. (Nome Fantasia: PERCURSA)<br>
-                CNPJ: 31.423.623/0001-09<br>
-                Endereço: RUA HENRI DUNANT, 873, CONJ 406 ANDAR 4, SANTO AMARO, SAO PAULO - SP, CEP: 04709-111<br>
-                Email: CONTATO@CURSERIA.COM<br>
-                Telefone: (11) 5181-2469</p>
+                Fernando Carvalho da Silva Cursos LTDA (Nome Fantasia: Pfp Zones)<br>
+                CNPJ: 37.575.379/0001-78<br>
+                Endereço: Rua Massuda Amin, 241, Centro, Cornélio Procópio - PR, CEP: 86300-000<br>
+                Email: fernando.jns@hotmail.com<br>
+                Telefone: (43) 3523-5593 / (41) 99862-1716</p>
                 <p><strong>2. Objeto:</strong><br>
                 Estes termos regem o uso do site e dos serviços oferecidos, incluindo a visualização de ofertas e a eventual interação para obtenção de produtos ou serviços relacionados a jogos, como o Free Fire.</p>
                 <p><strong>3. Uso do Site:</strong><br>
@@ -260,17 +285,17 @@
                 <p><strong>4. Conta do Usuário e ID do Jogador:</strong><br>
                 Para acessar ofertas personalizadas, pode ser solicitado o seu ID de jogador do Free Fire. Você é responsável por fornecer informações precisas. A segurança de sua conta no jogo é de sua responsabilidade.</p>
                 <p><strong>5. Propriedade Intelectual:</strong><br>
-                O conteúdo exibido no site, incluindo textos, gráficos, logos, ícones, imagens, clipes de áudio, downloads digitais, compilações de dados e software, é propriedade da CO CURSOS ONLINE S.A. ou de seus fornecedores de conteúdo e protegido pelas leis de direitos autorais.</p>
+                O conteúdo exibido no site, incluindo textos, gráficos, logos, ícones, imagens, clipes de áudio, downloads digitais, compilações de dados e software, é propriedade da Fernando Carvalho da Silva Cursos LTDA ou de seus fornecedores de conteúdo e protegido pelas leis de direitos autorais.</p>
                 <p><strong>6. Isenção de Garantias e Limitação de Responsabilidade:</strong><br>
-                Este site é fornecido "como está" e "conforme disponível". Não garantimos que o site será ininterrupto ou livre de erros. Em nenhuma circunstância a CO CURSOS ONLINE S.A. será responsável por quaisquer danos diretos, indiretos, incidentais, especiais ou consequenciais resultantes do uso ou da incapacidade de usar o site.</p>
+                Este site é fornecido "como está" e "conforme disponível". Não garantimos que o site será ininterrupto ou livre de erros. Em nenhuma circunstância a Fernando Carvalho da Silva Cursos LTDA será responsável por quaisquer danos diretos, indiretos, incidentais, especiais ou consequenciais resultantes do uso ou da incapacidade de usar o site.</p>
                 <p><strong>7. Não Afiliação:</strong><br>
                 Este site e seus serviços não são afiliados, endossados ou patrocinados pela Garena ou pelos desenvolvedores do Free Fire, a menos que explicitamente declarado. Todas as marcas registradas são propriedade de seus respectivos donos.</p>
                 <p><strong>8. Modificações nos Termos:</strong><br>
                 Reservamo-nos o direito de modificar estes Termos a qualquer momento. A data da "Última Atualização" no topo destes Termos indicará quando as alterações foram feitas. Seu uso continuado do site após tais modificações constitui sua concordância com os novos Termos.</p>
                 <p><strong>9. Lei Aplicável e Foro:</strong><br>
-                Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil, e você se submete irrevogavelmente à jurisdição exclusiva dos tribunais localizados em São Paulo - SP para resolver qualquer disputa que surja.</p>
+                Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil, e você se submete irrevogavelmente à jurisdição exclusiva dos tribunais localizados em Cornélio Procópio - PR para resolver qualquer disputa que surja.</p>
                 <p><strong>10. Contato:</strong><br>
-                Para quaisquer dúvidas sobre estes Termos de Uso, entre em contato conosco pelo e-mail: CONTATO@CURSERIA.COM.</p>
+                Para quaisquer dúvidas sobre estes Termos de Uso, entre em contato conosco pelo e-mail: fernando.jns@hotmail.com.</p>
             </div>
             <button class="close-modal-button" style="display:block; margin: 20px auto 0; padding: 10px 20px; background-color: #ccc; border: none; border-radius: 5px; cursor: pointer;">Fechar</button>
         </div>
@@ -282,13 +307,13 @@
             <span class="close-modal-button" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</span>
             <h2 style="margin-top:0; color: #333;">Política de Privacidade</h2>
             <div id="privacidadeContent" style="font-size: 0.9em; line-height: 1.6;">
-                <p><strong>Última Atualização:</strong> 18 de Abril de 2025</p>
-                <p>A CO CURSOS ONLINE S.A. ("nós", "nosso" ou "PERCURSA") está comprometida em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você visita nosso site.</p>
+                <p><strong>Última Atualização:</strong> 30 de Janeiro de 2025</p>
+                <p>A Fernando Carvalho da Silva Cursos LTDA ("nós", "nosso" ou "Pfp Zones") está comprometida em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você visita nosso site.</p>
                 <p><strong>1. Controlador dos Dados:</strong><br>
-                CO CURSOS ONLINE S.A.<br>
-                CNPJ: 31.423.623/0001-09<br>
-                Endereço: RUA HENRI DUNANT, 873, CONJ 406 ANDAR 4, SANTO AMARO, SAO PAULO - SP, CEP: 04709-111<br>
-                Email para questões de privacidade: CONTATO@CURSERIA.COM</p>
+                Fernando Carvalho da Silva Cursos LTDA<br>
+                CNPJ: 37.575.379/0001-78<br>
+                Endereço: Rua Massuda Amin, 241, Centro, Cornélio Procópio - PR, CEP: 86300-000<br>
+                Email para questões de privacidade: fernando.jns@hotmail.com</p>
                 <p><strong>2. Informações que Coletamos:</strong><br>
                 Podemos coletar informações sobre você de várias maneiras, incluindo:<br>
                 a. <strong>Dados Pessoais Identificáveis:</strong> Se você optar por nos fornecer seu ID de jogador do Free Fire, nome (conforme associado ao ID) ou outras informações de contato para receber ofertas personalizadas ou suporte.<br>
@@ -317,13 +342,13 @@
                 - Obter informações sobre as entidades públicas e privadas com as quais o controlador realizou uso compartilhado de dados;<br>
                 - Ser informado sobre a possibilidade de não fornecer consentimento e sobre as consequências da negativa;<br>
                 - Revogar o consentimento.<br>
-                Para exercer esses direitos, entre em contato conosco através do e-mail: CONTATO@CURSERIA.COM.</p>
+                Para exercer esses direitos, entre em contato conosco através do e-mail: fernando.jns@hotmail.com.</p>
                 <p><strong>7. Links para Outros Sites:</strong><br>
                 Nosso Site pode conter links para outros sites que não são operados por nós. Se você clicar em um link de terceiros, será direcionado para o site desse terceiro. Aconselhamos vivamente que reveja a Política de Privacidade de cada site que visita.</p>
                 <p><strong>8. Alterações a Esta Política de Privacidade:</strong><br>
                 Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data da "Última Atualização".</p>
                 <p><strong>9. Contato:</strong><br>
-                Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco: CONTATO@CURSERIA.COM.</p>
+                Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco: fernando.jns@hotmail.com.</p>
             </div>
             <button class="close-modal-button" style="display:block; margin: 20px auto 0; padding: 10px 20px; background-color: #ccc; border: none; border-radius: 5px; cursor: pointer;">Fechar</button>
         </div>
@@ -333,11 +358,11 @@
         // const USER_UID_API = "jOLNDleVHoaRt7CWliSsvnVZ7bJ2"; // REMOVIDO - Agora no backend
         // const API_KEY_API = "4FhoLUHvMr2PuDdveKSruMJ9IzzRtP"; // REMOVIDO - Agora no backend
         // const BASE_URL_API = "https://hl-gaming-official-main-api-beige.vercel.app/api"; // REMOVIDO
-        const BACKEND_URL = "http://localhost:3002/api/checkplayer"; // URL do seu backend ATUALIZADA para porta 3002
+        const BACKEND_URL = "http://localhost:3002/api/checkplayer"; // URL do seu backend local na porta 3002
         const MAX_ATTEMPTS = 7;
 
         const playerUidInput = document.getElementById('playerUid');
-        const regionInput = document.getElementById('region');
+        // const regionInput = document.getElementById('region'); // REMOVIDO
         const checkIdButton = document.getElementById('checkIdButton');
         const skipLoginButton = document.getElementById('skipLoginButton'); // Novo botão
         const backToIdButton = document.getElementById('backToIdButton'); // Botão Voltar
@@ -396,11 +421,11 @@
             userInfoSection.style.display = 'none';
             inputSection.style.display = 'block';
             playerUidInput.value = '';
-            // regionInput.value = ''; // Pode manter a região ou limpar
+            // regionInput.value = ''; // REMOVIDO
             messageSection.innerHTML = '';
             checkIdButton.disabled = false;
             playerUidInput.disabled = false;
-            regionInput.disabled = false;
+            // regionInput.disabled = false; // REMOVIDO
             if (skipLoginButton) skipLoginButton.style.display = 'inline'; // Mostra o botão de pular
         }
 
@@ -409,7 +434,7 @@
                 displayMessage(`Você excedeu o número máximo de ${MAX_ATTEMPTS} tentativas. Por favor, tente novamente mais tarde.`, 'error');
                 checkIdButton.disabled = true;
                 playerUidInput.disabled = true;
-                regionInput.disabled = true;
+                // regionInput.disabled = true; // REMOVIDO
                 inputSection.style.display = 'block'; // Garantir que o formulário (desabilitado) seja visível
                 userInfoSection.style.display = 'none';
                 if (skipLoginButton) skipLoginButton.style.display = 'none'; // Esconde o botão de pular se bloqueado
@@ -422,7 +447,8 @@
             if (handleBlockedState()) return;
 
             const playerUid = playerUidInput.value.trim();
-            const region = regionInput.value.trim() || 'br'; // Padrão 'br' se vazio
+            // const region = regionInput.value.trim() || 'br'; // REMOVIDO - região será fixa no backend ou não usada
+            const fixedRegion = 'br'; // Região Fixa
 
             if (!playerUid) {
                 displayMessage('Por favor, insira seu ID de Jogador para ofertas personalizadas, ou clique em "Continue mesmo assim" para ofertas gerais.', 'error');
@@ -438,7 +464,7 @@
             // Monta os parâmetros para o SEU backend
             const paramsToBackend = new URLSearchParams({
                 PlayerUid: playerUid,
-                region: region
+                region: fixedRegion // Enviando região fixa para o backend
             });
 
             try {
@@ -548,9 +574,9 @@
         
         // Verifica o estado de bloqueio ao carregar a página
         window.addEventListener('load', () => {
-            if (regionInput.value === '') { // Define valor padrão para região se estiver vazio no load
-                regionInput.value = 'br';
-            }
+            // if (regionInput.value === '') { // REMOVIDO
+            //     regionInput.value = 'br';
+            // }
             handleBlockedState();
         });
 
